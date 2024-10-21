@@ -14,14 +14,18 @@ export async function POST(request) {
     await verifyIdToken(idToken); // Verifica el token del usuario
 
     const { name, email, ownerId } = await request.json();
-    console.log("Datos recibidos:", { name, email, ownerId });
 
     if (!name || !email || !ownerId) {
       return NextResponse.json({ message: 'Nombre, correo y ID de propietario son obligatorios.' }, { status: 400 });
     }
 
-    // Crear una referencia a un nuevo documento en la colección 'users'
-    const userDocRef = firestore.collection('users').doc(ownerId); // Usar ownerId como ID del documento
+    // Verificar si el usuario ya existe
+    const userDocRef = firestore.collection('users').doc(ownerId);
+    const docSnapshot = await userDocRef.get();
+
+    if (docSnapshot.exists) {
+      return NextResponse.json({ message: 'Ya existe una cuenta con este ID de propietario.' }, { status: 400 });
+    }
 
     const userData = {
       name: name.trim(),
@@ -29,8 +33,9 @@ export async function POST(request) {
       roleId: 'gB4kyZZNT8HLbsyTBRGi', // ID del rol del usuario
       dateCreated: admin.firestore.FieldValue.serverTimestamp(),
       dateModified: admin.firestore.FieldValue.serverTimestamp(),
+      ownerId,
     };
-
+    
     // Guardar el usuario en la referencia creada
     await userDocRef.set(userData);
 
@@ -41,3 +46,4 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Error interno del servidor.', error: error.message }, { status: 500 });
   }
 }
+

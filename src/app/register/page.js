@@ -8,21 +8,21 @@ const Register = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const user = await loginWithGoogle(); // Llama a la función de inicio de sesión con Google
+      const { user, token } = await loginWithGoogle(); // Llama a la función de inicio de sesión con Google y obtiene el token
       // Crear el usuario en Firestore a través de la API
-      await createUserInFirestore(user);
-      // Redirige al usuario a la página de perfil después de iniciar sesión
-      router.push('/profile'); // Cambia la ruta según sea necesario
+      await createUserInFirestore(user, token); // Pasa el token aquí
+      
     } catch (error) {
       console.error("Error al crear la cuenta:", error.message);
     }
   };
 
-  const createUserInFirestore = async (user) => {
+  const createUserInFirestore = async (user, token) => {
     const response = await fetch('/api/users', { // Llama a la API
-      method: 'POST',
+      method: 'POST', 
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Incluye el token en el encabezado
       },
       body: JSON.stringify({
         name: user.displayName || '',
@@ -30,7 +30,10 @@ const Register = () => {
         ownerId: user.uid,
       }),
     });
-
+    if(response){
+        // Redirige al usuario a la página de perfil después de iniciar sesión
+      router.push('/profile'); // Cambia la ruta según sea necesario
+    }
     if (!response.ok) {
       throw new Error('Error al crear el usuario en Firestore');
     }
