@@ -1,12 +1,16 @@
 "use client"; // Necesario para usar hooks en componentes de cliente
 
-import { loginWithGoogle } from '../../../lib/authService'; // Asegúrate de que la ruta sea correcta
+import { useRouter } from 'next/navigation'; // Importa useRouter
+import { loginWithGoogle } from '../../libs/authService'; // Asegúrate de que la ruta sea correcta
 
 const Login = () => {
+  const router = useRouter(); // Inicializa el router
+
   const handleGoogleLogin = async () => {
     try {
       const user = await loginWithGoogle();
-      // Aquí puedes redirigir al usuario a otra página o realizar alguna acción
+      // Redirige al usuario a la página de perfil después de iniciar sesión
+      router.push('/profile'); // Cambia la ruta según sea necesario
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
     }
