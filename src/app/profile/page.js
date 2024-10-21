@@ -22,6 +22,10 @@ export default function Profile() {
   const navigateToCreateRole = () => {
     router.push('/roles/create');
   };
+  const navigateToEditProfile = () => {
+    router.push('/profile/edit'); // Redirige a la página de edición del perfil
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -40,6 +44,13 @@ export default function Profile() {
       >
         Crear Nuevo Rol
       </button>
+      <button
+        onClick={navigateToEditProfile}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Editar Perfil
+      </button>
+      
       <button
         onClick={handleSignOut}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
