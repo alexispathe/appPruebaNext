@@ -22,12 +22,12 @@ export async function GET(request, { params }) {
     }
 
     const userData = userSnapshot.data();
-    
-    // Solo devuelve el ownerId, name y profileImageUrl
+    // Solo devuelve el ownerId, name y profileImageUrl y roleID
     const responseData = {
       ownerId: userData.ownerId,
       name: userData.name,
       profileImageUrl: userData.profileImageUrl || '',
+      roleId: userData.roleId
     };
 
     return NextResponse.json(responseData, { status: 200 });
