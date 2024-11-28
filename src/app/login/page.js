@@ -10,7 +10,7 @@ const Login = () => {
     try {
       const user = await loginWithGoogle();
       // Redirige al usuario a la página de perfil después de iniciar sesión
-      router.push('/profile'); // Cambia la ruta según sea necesario
+      router.push('/users/profile'); // Cambia la ruta según sea necesario
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
     }
