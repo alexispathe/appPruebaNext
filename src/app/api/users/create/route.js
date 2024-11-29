@@ -1,7 +1,7 @@
 // src/app/api/users/route.js
 import { NextResponse } from 'next/server';
-import { firestore, verifyIdToken } from '../../../libs/firebaseAdmin';
-import admin from 'firebase-admin'; // Importa el SDK de Firebase Admin
+import { firestore, verifyIdToken } from '../../../../libs/firebaseAdmin';
+import admin from 'firebase-admin'; // Importa el SDK de Firebase Admin 
 
 export async function POST(request) {
   try {

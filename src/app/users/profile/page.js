@@ -1,4 +1,4 @@
-// src/app/profile/page.js
+// src/app/users/profile/page.js
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -26,10 +26,10 @@ export default function Profile() {
     router.push('/profile/edit'); // Redirige a la página de edición del perfil
   };
   const navigateToCreateCategory = () => {
-    router.push('/category/create'); // Redirige a la página de edición del perfil
+    router.push('/categories/create'); // Redirige a la página de edición del perfil
   };
   const navigateToUpdateCategory = () => {
-    router.push('/category/update/'); // Redirige a la página de edición del perfil
+    router.push('/categories/update/'); // Redirige a la página de edición del perfil
   };
 
   const navigateToCreateSubCategory = () => {

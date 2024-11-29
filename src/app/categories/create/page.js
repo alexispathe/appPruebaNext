@@ -33,13 +33,12 @@ const CreateCategory = () => {
         'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
       },
     });
-
     if (userResponse.ok) {
       const userData = await userResponse.json();
       const { roleId } = userData;
 
       // Verifica los permisos del rol correspondiente
-      const roleResponse = await fetch(`/api/roles/${roleId}`, {
+      const roleResponse = await fetch(`/api/roles/get/${roleId}`, {
         headers: {
           'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
         },
