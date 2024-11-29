@@ -25,7 +25,7 @@ export async function PUT(request, { params }) {
 
     // Buscar la categoría por la propiedad url
     const categorySnapshot = await firestore.collection('categories')
-      .where('uniqueID', '==', url) // Cambia a buscar por la propiedad url
+      .where('url', '==', url) // Cambia a buscar por la propiedad url
       .limit(1) // Limitar a un solo resultado
       .get();
 

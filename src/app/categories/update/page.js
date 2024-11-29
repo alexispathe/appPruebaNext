@@ -2,21 +2,28 @@
 "use client"; // Esto marca el componente como del lado del cliente
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '../../../libs/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const UpdateCategory = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const url = searchParams.get('id'); // Captura el 'id' de la URL
+
   const [categoryData, setCategoryData] = useState({
     name: '',
     description: '',
   });
   const [error, setError] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
-  const url = "KSzaEDFIngZ0MXKcmtxl";
 
   useEffect(() => {
+    if (!url) {
+      setError('No se proporcionó un ID de categoría válido.');
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push('/login');
@@ -25,17 +32,21 @@ const UpdateCategory = () => {
       }
     });
     return () => unsubscribe(); // Limpieza del suscriptor
-  }, [router]);
+  }, [router, url]);
 
   const checkUserPermissions = async (userId) => {
-    const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
-    const userResponse = await fetch(`/api/users/${userId}/get`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
+      const userResponse = await fetch(`/api/users/${userId}/get`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    if (userResponse.ok) {
+      if (!userResponse.ok) {
+        throw new Error('Error al obtener datos del usuario.');
+      }
+
       const userData = await userResponse.json();
       const { roleId } = userData;
 
@@ -45,38 +56,42 @@ const UpdateCategory = () => {
         },
       });
 
-      if (roleResponse.ok) {
-        const roleData = await roleResponse.json();
-        if (roleData.permissions.includes('update')) {
-          setHasPermission(true);
-          loadCategoryData(url); // Cargar datos de la categoría si tiene permiso
-        } else {
-          router.push('/not-found'); // Redirige si no tiene permiso
-        }
-      } else {
-        setError('Error al obtener los permisos del rol.');
+      if (!roleResponse.ok) {
+        throw new Error('Error al obtener los permisos del rol.');
       }
-    } else {
-      setError('Error al obtener datos del usuario.');
+
+      const roleData = await roleResponse.json();
+      if (roleData.permissions.includes('update')) {
+        setHasPermission(true);
+        loadCategoryData(url); // Cargar datos de la categoría si tiene permiso
+      } else {
+        router.push('/not-found'); // Redirige si no tiene permiso
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   const loadCategoryData = async (url) => {
-    const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
-    const response = await fetch(`/api/categories/get/category/${url}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-    });
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
+      const response = await fetch(`/api/categories/get/category/${url}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        throw new Error('Error al cargar la categoría.');
+      }
+
       const data = await response.json();
       setCategoryData({
         name: data.name,
         description: data.description || '',
       });
-    } else {
-      setError('Error al cargar la categoría.');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -94,29 +109,39 @@ const UpdateCategory = () => {
       return;
     }
 
-    const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
-    const response = await fetch(`/api/categories/update/${url}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: categoryData.name,
-        description: categoryData.description,
-      }),
-    });
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
+      const response = await fetch(`/api/categories/update/${url}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: categoryData.name,
+          description: categoryData.description,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      setError(errorData.message);
-    } else {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al actualizar la categoría.');
+      }
+
       alert("Categoría actualizada correctamente");
       router.push('/users/profile'); // Redirige al perfil después de la actualización
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-  if (!hasPermission) return null; // No renderizar nada si no tiene permisos
+  if (!hasPermission) {
+    return (
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">
+        {error ? <p className="text-red-500 mb-2">{error}</p> : <p>Cargando...</p>}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">

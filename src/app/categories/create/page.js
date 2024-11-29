@@ -27,13 +27,18 @@ const CreateCategory = () => {
   }, [router]);
 
   const checkUserPermissions = async (userId) => {
-    const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
-    const userResponse = await fetch(`/api/users/${userId}/get`, {
-      headers: {
-        'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
-      },
-    });
-    if (userResponse.ok) {
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
+      const userResponse = await fetch(`/api/users/${userId}/get`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
+        },
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Error al obtener datos del usuario.');
+      }
+
       const userData = await userResponse.json();
       const { roleId } = userData;
 
@@ -44,19 +49,19 @@ const CreateCategory = () => {
         },
       });
 
-      if (roleResponse.ok) {
-        const roleData = await roleResponse.json();
-        // Verifica si el rol tiene el permiso 'create'
-        if (roleData.permissions.includes('create')) {
-          setHasPermission(true);
-        } else {
-          router.push('/not-found'); // Redirige si no tiene permiso
-        }
-      } else {
-        setError('Error al obtener los permisos del rol.');
+      if (!roleResponse.ok) {
+        throw new Error('Error al obtener los permisos del rol.');
       }
-    } else {
-      setError('Error al obtener datos del usuario.');
+
+      const roleData = await roleResponse.json();
+      // Verifica si el rol tiene el permiso 'create'
+      if (roleData.permissions.includes('create')) {
+        setHasPermission(true);
+      } else {
+        router.push('/not-found'); // Redirige si no tiene permiso
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -74,28 +79,40 @@ const CreateCategory = () => {
       return;
     }
 
-    const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
-    const response = await fetch('/api/categories/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
-      },
-      body: JSON.stringify({
-        name: categoryData.name,
-        description: categoryData.description,
-      }),
-    });
+    try {
+      const token = await auth.currentUser.getIdToken(); // Obtén el token del usuario
+      const response = await fetch('/api/categories/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluye el token en la cabecera
+        },
+        body: JSON.stringify({
+          name: categoryData.name,
+          description: categoryData.description,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      setError(errorData.message);
-    } else {
-      alert("Categoría creada correctamente");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al crear la categoría.');
+      }
+
+      const responseData = await response.json();
+      alert(`Categoría creada correctamente. URL: ${responseData.url}`);
+      router.push('/users/profile'); // Redirige al perfil después de la creación
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-  if (!hasPermission) return null; // No renderizar nada si no tiene permisos
+  if (!hasPermission) {
+    return (
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">
+        {error ? <p className="text-red-500 mb-2">{error}</p> : <p>Cargando...</p>}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">
