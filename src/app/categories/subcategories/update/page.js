@@ -17,7 +17,7 @@ const UpdateSubcategory = ({ params }) => {
   const [hasPermission, setHasPermission] = useState(false);
   // const { categoryID, subcategoryID } = params;
   const categoryID = "gz5OxtBNgYM5E00v3f3E";
-  const subCategoryID = "IR32Kg1QOl2KvtwUJVr7"
+  const subCategoryID = "jHVK07ATkWuXmRn16s09"
 
 
   useEffect(() => {

@@ -47,7 +47,7 @@ export async function POST(request) {
       description: description ? description.trim() : '',
       dateCreated: admin.firestore.FieldValue.serverTimestamp(),
       dateModified: admin.firestore.FieldValue.serverTimestamp(),
-      uniqueID: subcategoryDocRef.id,
+      subCategoryID: subcategoryDocRef.id,
       ownerId,
       categoryID,
       url,
@@ -55,7 +55,7 @@ export async function POST(request) {
     console.log(subcategoryData)
     await subcategoryDocRef.set(subcategoryData);
 
-    return NextResponse.json({ message: 'Subcategoría creada exitosamente.', uniqueID: subcategoryDocRef.id }, { status: 201 });
+    return NextResponse.json({ message: 'Subcategoría creada exitosamente.', subCategoryID: subcategoryDocRef.id }, { status: 201 });
   } catch (error) {
     console.error('Error al crear la subcategoría:', error);
     return NextResponse.json({ message: 'Error interno del servidor.', error: error.message }, { status: 500 });
