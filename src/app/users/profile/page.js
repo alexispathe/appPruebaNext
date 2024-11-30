@@ -33,7 +33,7 @@ export default function Profile() {
   };
 
   const navigateToCreateSubCategory = () => {
-    router.push('/subCategories/create'); // Redirige a la página de edición del perfil
+    router.push('/categories/subCategories/create'); // Redirige a la página de edición del perfil
   };
   const navigateToUpdateSubCategory = () => {
     router.push('/subCategories/update/'); // Redirige a la página de edición del perfil
