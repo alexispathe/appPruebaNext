@@ -1,4 +1,5 @@
 // src/app/api/categories/get/category/route.js
+//Devuelve la categoria mediante su url, esto para poder actualizarla
 import { NextResponse } from 'next/server';
 import { firestore, verifyIdToken } from '../../../../../../libs/firebaseAdmin';
 

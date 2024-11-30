@@ -1,5 +1,6 @@
 // src/app/api/categories/get/list/route.js
-
+//Swvuelve la lista de las categorias existentes para mostrarlos en el formulario 
+//de crear subCategorias
 import { NextResponse } from 'next/server';
 import { firestore, verifyIdToken } from '../../../../../libs/firebaseAdmin';
 
