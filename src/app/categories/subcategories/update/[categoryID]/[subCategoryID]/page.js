@@ -1,12 +1,18 @@
 "use client";
+//http://localhost:3000/categories/subCategories/update/gz5OxtBNgYM5E00v3f3E/jHVK07ATkWuXmRn16s09
+// src/app/categories/subCategories/update/[categoryID]/[subCategoryID]/page.js
+"use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth } from '../../../../libs/firebaseConfig';
+import { useRouter, useParams } from 'next/navigation';
+import { auth } from '../../../../../../libs/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const UpdateSubcategory = ({ params }) => {
+const UpdateSubcategory = () => {
   const router = useRouter();
+  const params = useParams();
+  const { categoryID, subCategoryID } = params;
+
   const [subcategoryData, setSubcategoryData] = useState({
     name: '',
     description: '',
@@ -15,12 +21,13 @@ const UpdateSubcategory = ({ params }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
-  // const { categoryID, subcategoryID } = params;
-  const categoryID = "gz5OxtBNgYM5E00v3f3E";
-  const subCategoryID = "jHVK07ATkWuXmRn16s09"
-
 
   useEffect(() => {
+    if (!categoryID || !subCategoryID) {
+      setError('Parámetros de URL faltantes.');
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push('/login');
@@ -29,7 +36,7 @@ const UpdateSubcategory = ({ params }) => {
       }
     });
     return () => unsubscribe();
-  }, [router]);
+  }, [router, categoryID, subCategoryID]);
 
   const checkUserPermissions = async (userId) => {
     try {
@@ -66,6 +73,7 @@ const UpdateSubcategory = ({ params }) => {
         setError('Error al obtener datos del usuario.');
       }
     } catch (error) {
+      console.error('Error al verificar los permisos:', error);
       setError('Error al verificar los permisos.');
     }
   };
@@ -86,6 +94,7 @@ const UpdateSubcategory = ({ params }) => {
         setError('Error al cargar las categorías.');
       }
     } catch (error) {
+      console.error('Error al cargar las categorías:', error);
       setError('Error al cargar las categorías.');
     }
   };
@@ -110,6 +119,7 @@ const UpdateSubcategory = ({ params }) => {
         setError('Error al cargar la subcategoría.');
       }
     } catch (error) {
+      console.error('Error al cargar la subcategoría:', error);
       setError('Error al cargar la subcategoría.');
     }
   };
@@ -133,26 +143,37 @@ const UpdateSubcategory = ({ params }) => {
       return;
     }
 
-    const token = await auth.currentUser.getIdToken();
-    const response = await fetch(`/api/categories/subCategories/update/${categoryID}/${subCategoryID}/`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(subcategoryData),
-    });
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const response = await fetch(`/api/categories/subCategories/update/${categoryID}/${subCategoryID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(subcategoryData),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      setError(errorData.message);
-    } else {
-      alert("Subcategoría actualizada correctamente");
-      router.push('/users/profile');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      } else {
+        alert("Subcategoría actualizada correctamente");
+        router.push('/users/profile');
+      }
+    } catch (err) {
+      console.error('Error al actualizar la subcategoría:', err);
+      setError(err.message || 'Error al actualizar la subcategoría.');
     }
   };
 
-  if (!hasPermission) return null;
+  if (!hasPermission) {
+    return (
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">
+        {error ? <p className="text-red-500 mb-2">{error}</p> : <p>Cargando...</p>}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded">
