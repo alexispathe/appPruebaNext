@@ -39,6 +39,10 @@ export default function Profile() {
     router.push('/categories/subCategories/update/'); // Redirige a la página de edición del perfil
   };
 
+  const navigateToCreateProduct = () => {
+    router.push('/products/create'); // Redirige a la página de edición del perfil
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -93,6 +97,12 @@ export default function Profile() {
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Actualizar sub categoria
+      </button>
+      <button
+        onClick={navigateToCreateProduct}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Crear producto
       </button>
     </div>
   );
