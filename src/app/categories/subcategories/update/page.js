@@ -134,7 +134,7 @@ const UpdateSubcategory = ({ params }) => {
     }
 
     const token = await auth.currentUser.getIdToken();
-    const response = await fetch(`/api/categories/subCategories/update/${categoryID}/${subCategoryID}/route.js`, {
+    const response = await fetch(`/api/categories/subCategories/update/${categoryID}/${subCategoryID}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ const UpdateSubcategory = ({ params }) => {
       setError(errorData.message);
     } else {
       alert("Subcategoría actualizada correctamente");
-      router.push('/profile');
+      router.push('/users/profile');
     }
   };
 

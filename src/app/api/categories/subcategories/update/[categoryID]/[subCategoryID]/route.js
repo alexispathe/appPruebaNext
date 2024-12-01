@@ -1,4 +1,4 @@
-// src/app/api/categories/subCategiries/update/[categoryID]/[subCategoryID]/route.js
+// src/app/api/categories/subCategories/update/[categoryID]/[subCategoryID]/route.js
 import { NextResponse } from 'next/server';
 import { firestore, verifyIdToken } from '../../../../../../../libs/firebaseAdmin';
 import admin from 'firebase-admin';
