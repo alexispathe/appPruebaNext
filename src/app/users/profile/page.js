@@ -42,6 +42,9 @@ export default function Profile() {
   const navigateToCreateProduct = () => {
     router.push('/products/create'); // Redirige a la página de edición del perfil
   };
+  const navigateToUpdateProduct = () => {
+    router.push('/products/update'); // Redirige a la página de edición del perfil
+  };
 
   const handleSignOut = async () => {
     try {
@@ -103,6 +106,12 @@ export default function Profile() {
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Crear producto
+      </button>
+      <button
+        onClick={navigateToUpdateProduct}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Actualizar producto
       </button>
     </div>
   );
